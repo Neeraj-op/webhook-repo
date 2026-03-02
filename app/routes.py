@@ -24,18 +24,15 @@ def webhook_receiver():
     Stores parsed data to MongoDB
     """
     try:
-        # Get JSON payload from GitHub
         payload = request.json
         
         if not payload:
             return jsonify({'error': 'No payload received'}), 400
         
-        # Determine event type from headers
         event_type = request.headers.get('X-GitHub-Event', '')
         
         print(f"📨 Received webhook: {event_type}")
         
-        # Parse event based on type
         event_data = None
         
         if event_type == 'push':
@@ -125,7 +122,7 @@ def get_events():
 @main_bp.route('/events/clear', methods=['POST'])
 def clear_events():
     """
-    Clear all events from MongoDB (for testing)
+    Clear all events from MongoDB
     """
     try:
         db = get_db()

@@ -1,8 +1,3 @@
-"""
-Flask application factory
-Creates and configures the Flask app instance
-"""
-
 from flask import Flask
 from dotenv import load_dotenv
 import os
@@ -16,7 +11,7 @@ def create_app():
                 template_folder='templates',
                 static_folder='../static')
     
-    # Configuration
+    # Config
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-secret-key')
     app.config['MONGO_URI'] = os.getenv('MONGO_URI')
     

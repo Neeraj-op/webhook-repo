@@ -1,8 +1,3 @@
-"""
-Flask application entry point
-Run this file to start the webhook receiver server
-"""
-
 from app import create_app
 import os
 from dotenv import load_dotenv

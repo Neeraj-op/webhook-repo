@@ -2,7 +2,7 @@
 Utility functions for parsing webhooks and formatting data
 """
 
-from datetime import datetime
+from datetime import datetime, timedelta
 import pytz
 import hashlib
 
@@ -23,7 +23,6 @@ def parse_push_event(payload):
         ref = payload.get('ref', '')
         to_branch = ref.split('/')[-1] if '/' in ref else ref
         
-        # Get pusher information
         pusher = payload.get('pusher', {})
         author = pusher.get('name', 'Unknown')
         
@@ -33,13 +32,12 @@ def parse_push_event(payload):
         # Get timestamp from head commit or use current time
         head_commit = payload.get('head_commit', {})
         timestamp = head_commit.get('timestamp', datetime.utcnow().isoformat() + 'Z')
-        # timestamp = head_commit.get('timestamp', datetime.now(ist).isoformat())
         
         return {
             'request_id': request_id,
             'author': author,
             'action': 'PUSH',
-            'from_branch': None,  # Push doesn't have from_branch
+            'from_branch': None,  # Push not have from_branch
             'to_branch': to_branch,
             'timestamp': timestamp
         }
@@ -74,18 +72,13 @@ def parse_pull_request_event(payload):
         # Get PR ID as request_id
         request_id = str(pull_request.get('id', hashlib.md5(str(payload).encode()).hexdigest()))
         
-        # Determine timestamp based on action
         if action == 'closed' and pull_request.get('merged'):
-            # This is a MERGE event
             merged_by = pull_request.get('merged_by', {})
             author = merged_by.get('login', author)
             timestamp = pull_request.get('merged_at', datetime.utcnow().isoformat() + 'Z')
-            # timestamp = pull_request.get('merged_at', datetime.now(ist).isoformat())
             event_action = 'MERGE'
         else:
-            # This is a PULL_REQUEST event
             timestamp = pull_request.get('created_at', datetime.utcnow().isoformat() + 'Z')
-            # timestamp = pull_request.get('created_at', datetime.now(ist).isoformat())
             event_action = 'PULL_REQUEST'
         
         return {
@@ -102,29 +95,29 @@ def parse_pull_request_event(payload):
 
 def format_timestamp(iso_timestamp):
     """
-    Format ISO timestamp to human-readable format
+    Format ISO timestamp to human-readable IST format
     
     Args:
-        iso_timestamp: ISO 8601 timestamp string
+        iso_timestamp: ISO 8601 timestamp string (UTC)
     
     Returns:
-        str: Formatted timestamp (e.g., "1st April 2021 - 9:30 PM UTC")
+        str: Formatted timestamp in IST (e.g., "2nd March 2026 - 9:32 PM IST")
     """
     try:
-        # Parse ISO timestamp
-        dt = datetime.fromisoformat(iso_timestamp.replace('Z', '+00:00'))
+        dt_utc = datetime.fromisoformat(iso_timestamp.replace('Z', '+00:00'))
         
-        # Get day with ordinal suffix
-        day = dt.day
+        ist_offset = timedelta(hours=5, minutes=30)
+        dt_ist = dt_utc + ist_offset
+        
+        day = dt_ist.day
         if 11 <= day <= 13:
             suffix = 'th'
         else:
             suffix = {1: 'st', 2: 'nd', 3: 'rd'}.get(day % 10, 'th')
         
-        # Format: "1st April 2021 - 9:30 PM UTC"
-        formatted = dt.strftime(f'%d{suffix} %B %Y - %I:%M %p UTC')
+        # Format: "2nd March 2026 - 9:32 PM IST"
+        formatted = dt_ist.strftime(f'%d{suffix} %B %Y - %I:%M %p IST')
         
-        # Remove leading zero from day if present
         if formatted[0] == '0':
             formatted = formatted[1:]
         

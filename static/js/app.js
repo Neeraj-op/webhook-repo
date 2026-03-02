@@ -39,9 +39,6 @@ const elements = {
     totalCount: null
 };
 
-/**
- * Initialize application
- */
 function init() {
     // Get DOM elements
     elements.eventsList = document.getElementById('eventsList');
@@ -170,8 +167,6 @@ function updateUI() {
         elements.emptyState.style.display = 'block';
         elements.eventsList.style.display = 'none';
     }
-
-    // Update stats
     updateStats();
 }
 
@@ -339,7 +334,6 @@ function stopAutoRefresh() {
  * Show error message
  */
 function showError(message) {
-    // Create error notification
     const notification = document.createElement('div');
     notification.className = 'error-notification';
     notification.style.cssText = `

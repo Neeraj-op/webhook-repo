@@ -7,7 +7,6 @@ from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure
 import os
 
-# Global MongoDB client and database
 mongo_client = None
 db = None
 
@@ -28,14 +27,10 @@ def init_db(app):
         # Test connection
         mongo_client.admin.command('ping')
 
-        # Get database (database name from URI or default to 'webhook_db')
-        # db = mongo_client.get_default_database() if mongo_client.get_default_database() else mongo_client.webhook_db
         db = mongo_client.get_default_database()
 
-        # Create indexes for better query performance
-        # Sort by timestamp descending
         db.events.create_index([("timestamp", -1)])
-        # Prevent duplicate events
+
         db.events.create_index("request_id", unique=True)
 
         print(f"✅ MongoDB connected successfully to: {db.name}")
@@ -49,12 +44,10 @@ def init_db(app):
 
 
 def get_db():
-    """Get database instance"""
     return db
 
 
 def close_db():
-    """Close MongoDB connection"""
     global mongo_client
     if mongo_client:
         mongo_client.close()
