@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub Webhook Monitor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1 class="title">
+                    <span class="icon">📡</span>
+                    GitHub Webhook Monitor
+                </h1>
+                <p class="subtitle">Real-time repository event tracking</p>
+            </div>
+
+            <div class="header-actions">
+                <button id="refreshBtn" class="btn btn-secondary">
+                    <span class="icon">🔄</span>
+                    Refresh
+                </button>
+                <button id="clearBtn" class="btn btn-danger">
+                    <span class="icon">🗑️</span>
+                    Clear All
+                </button>
+            </div>
+        </header>
+
+        <!-- Stats Section -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon push">⬆️</div>
+                <div class="stat-content">
+                    <div class="stat-label">Pushes</div>
+                    <div class="stat-value" id="pushCount">0</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon pr">🔀</div>
+                <div class="stat-content">
+                    <div class="stat-label">Pull Requests</div>
+                    <div class="stat-value" id="prCount">0</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon merge">✅</div>
+                <div class="stat-content">
+                    <div class="stat-label">Merges</div>
+                    <div class="stat-value" id="mergeCount">0</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon total">📊</div>
+                <div class="stat-content">
+                    <div class="stat-label">Total Events</div>
+                    <div class="stat-value" id="totalCount">0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Banner -->
+        <div class="status-banner" id="statusBanner">
+            <span class="status-dot" id="statusDot"></span>
+            <span id="statusText">Connecting...</span>
+            <span class="last-update">Last updated: <span id="lastUpdate">Never</span></span>
+        </div>
+
+        <!-- Events Section -->
+        <div class="events-section">
+            <div class="events-header">
+                <h2>Recent Events</h2>
+                <div class="auto-refresh">
+                    <input type="checkbox" id="autoRefreshToggle" checked>
+                    <label for="autoRefreshToggle">Auto-refresh (15s)</label>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loadingState" class="loading-state">
+                <div class="spinner"></div>
+                <p>Loading events...</p>
+            </div>
+
+            <!-- Empty State -->
+            <div id="emptyState" class="empty-state" style="display: none;">
+                <div class="empty-icon">📭</div>
+                <h3>No Events Yet</h3>
+                <p>Webhook events will appear here when you push code or create pull requests in your monitored
+                    repository.</p>
+                <div class="empty-actions">
+                    <p class="empty-tip"><strong>Tip:</strong> Make sure your webhook is configured correctly in the
+                        GitHub repository settings.</p>
+                </div>
+            </div>
+
+            <!-- Events List -->
+            <div id="eventsList" class="events-list" style="display: none;">
+                <!-- Events will be inserted here dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+
+</html>
