@@ -102,38 +102,112 @@ def parse_pull_request_event(payload):
         raise
 
 
+# def format_timestamp(iso_timestamp):
+#     """
+#     Format ISO timestamp to human-readable IST format
+
+#     Args:
+#         iso_timestamp: ISO 8601 timestamp string (UTC)
+
+#     Returns:
+#         str: Formatted timestamp in IST (e.g., "2nd March 2026 - 9:32 PM IST")
+#     """
+#     try:
+#         dt_utc = datetime.fromisoformat(iso_timestamp.replace('Z', '+00:00'))
+
+#         dt_ist = dt_utc
+
+#         day = dt_ist.day
+#         if 11 <= day <= 13:
+#             suffix = 'th'
+#         else:
+#             suffix = {1: 'st', 2: 'nd', 3: 'rd'}.get(day % 10, 'th')
+
+#         # Format: "2nd March 2026 - 9:32 PM IST"
+#         formatted = dt_ist.strftime(f'%d{suffix} %B %Y - %I:%M %p IST')
+
+#         if formatted[0] == '0':
+#             formatted = formatted[1:]
+
+#         return formatted
+#     except Exception as e:
+#         print(f"Error formatting timestamp: {e}")
+#         return iso_timestamp
+
+# def format_timestamp(iso_timestamp):
+#     """
+#     Format ISO timestamp to human-readable IST format
+
+#     Args:
+#         iso_timestamp: ISO 8601 timestamp string (UTC)
+
+#     Returns:
+#         str: Formatted timestamp in IST (e.g., "2nd March 2026 - 9:32 PM IST")
+#     """
+#     try:
+#         # Parse the UTC timestamp
+#         dt_utc = datetime.fromisoformat(iso_timestamp.replace('Z', '+00:00'))
+        
+#         # Convert to IST using pytz (you already imported it!)
+#         utc_zone = pytz.utc
+        
+#         # If datetime is naive (no timezone), assume it's UTC
+#         if dt_utc.tzinfo is None:
+#             dt_utc = utc_zone.localize(dt_utc)
+        
+#         # Convert to IST
+#         dt_ist = dt_utc.astimezone(ist)
+        
+#         # Get day with ordinal suffix
+#         day = dt_ist.day
+#         if 11 <= day <= 13:
+#             suffix = 'th'
+#         else:
+#             suffix = {1: 'st', 2: 'nd', 3: 'rd'}.get(day % 10, 'th')
+
+#         # Format: "2nd March 2026 - 9:32 PM IST"
+#         formatted = dt_ist.strftime(f'%d{suffix} %B %Y - %I:%M %p IST')
+
+#         # Remove leading zero from day if present
+#         if formatted[0] == '0':
+#             formatted = formatted[1:]
+
+#         return formatted
+#     except Exception as e:
+#         print(f"Error formatting timestamp: {e}")
+#         return iso_timestamp
+
 def format_timestamp(iso_timestamp):
     """
     Format ISO timestamp to human-readable IST format
-
-    Args:
-        iso_timestamp: ISO 8601 timestamp string (UTC)
-
-    Returns:
-        str: Formatted timestamp in IST (e.g., "2nd March 2026 - 9:32 PM IST")
+    Handles multiple timestamp formats
     """
     try:
-        dt_utc = datetime.fromisoformat(iso_timestamp.replace('Z', '+00:00'))
-
-        dt_ist = dt_utc
-
+        from dateutil import parser
+        
+        # Use dateutil parser - handles ANY ISO format
+        dt = parser.parse(iso_timestamp)
+        
+        # Convert to IST
+        if dt.tzinfo is None:
+            # No timezone - assume UTC
+            dt = pytz.utc.localize(dt)
+        
+        dt_ist = dt.astimezone(ist)
+        
+        # Format
         day = dt_ist.day
-        if 11 <= day <= 13:
-            suffix = 'th'
-        else:
-            suffix = {1: 'st', 2: 'nd', 3: 'rd'}.get(day % 10, 'th')
-
-        # Format: "2nd March 2026 - 9:32 PM IST"
+        suffix = 'th' if 11 <= day <= 13 else {1: 'st', 2: 'nd', 3: 'rd'}.get(day % 10, 'th')
         formatted = dt_ist.strftime(f'%d{suffix} %B %Y - %I:%M %p IST')
-
+        
         if formatted[0] == '0':
             formatted = formatted[1:]
-
+        
         return formatted
     except Exception as e:
         print(f"Error formatting timestamp: {e}")
+        print(f"Timestamp value: {iso_timestamp}")
         return iso_timestamp
-
 
 def format_event_message(event):
     """
