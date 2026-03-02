@@ -95,7 +95,7 @@ def get_events():
         db = get_db()
         
         # Get all events, sorted by timestamp (newest first)
-        events = list(db.events.find().sort('timestamp', -1))
+        events = list(db.events.find().sort('_id', -1))
         
         # Format events for display
         formatted_events = []
